@@ -54,7 +54,7 @@ def save_contacts(filename):
             for c in contacts:
                 f.write(f"{c['name']},{c['phone']},{c['email']}\n")
         print(f"Контакты сохранены в {filename}")
-    except Exception as e:
+    except Exception as e
         print("Ошибка при сохранении:", e)
 
 def load_contacts(filename):
@@ -74,7 +74,7 @@ def menu():
     """Главное меню"""
     while True:
         print("\nМеню:")
-        print("1. Показать все контакты")
+        print("1. Показать все контакты"
         print("2. Добавить контакт")
         print("3. Найти контакт")
         print("4. Удалить контакт")
@@ -89,7 +89,7 @@ def menu():
             name = input("Имя: ")
             phone = input("Телефон: ")
             email = input("Email (необязательно): ")
-            add_contatc(name, phone, email)  # <-- опечатка!
+            add_contatc(name, phone, email)
         elif choice == "3":
             name = input("Имя для поиска: ")
             c = find_contact(name)
