@@ -28,880 +28,1216 @@ def fix_fstring_issues(text):
     return fixed_text
 
 text_content="""
-# Практикум по Pandas
-## Занятие для 9-10 классов (120 минут)
+# Практикум по линейным моделям в машинном обучении
 
-# Импорт необходимых библиотек
+## Импорт необходимых библиотек
+
 ```python
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+import warnings
+warnings.filterwarnings('ignore')
 
 # Устанавливаем сид для воспроизводимости результатов
 np.random.seed(42)
-```
-
-# Настройка для корректного отображения графиков и русского текста
-```python
-plt.rcParams['font.family'] = 'DejaVu Sans'
-plt.rcParams['axes.unicode_minus'] = False
-plt.rcParams['figure.figsize'] = (10, 6)
-print("Добро пожаловать на практикум по Pandas!")
-print("Сегодня мы изучим основы работы с данными и проведем анализ лагерных активностей")
+plt.style.use('default')
 ```
 
 ---
 
-## Блок 1: Основы работы с DataFrame (40 минут)
+## Блок 1: Основы линейной регрессии
 
-### Задание 1.1: Создание DataFrame из словаря
+### Задание 1.1: Понимание простейшей линейной модели y = wx + b
 
 **Теория:**
-DataFrame - это двумерная структура данных в pandas, похожая на таблицу Excel. Можно создавать DataFrame из словарей, списков, CSV файлов.
+Линейная регрессия - это простая модель, которая пытается найти прямую линию, наилучшим образом описывающую зависимость между входной переменной x и выходной переменной y.
+
+Простейшая модель имеет вид: **y = w*x + b**
+
+где:
+- **w** - вес (наклон прямой)
+- **b** - смещение (точка пересечения с осью y)
+- **x** - входной признак
+- **y** - целевая переменная
 
 **Задание:**
-1. Создайте DataFrame с данными о 8 участниках лагеря
-2. Используйте точно эти имена: Александр, Игорь, Илья, Ярослав, Михаил, Дарья, Мария, Александр
-3. Добавьте столбцы с генерацией случайных данных (используйте np.random.seed(42)):
-   - возраст: от 15 до 17 лет (случайные целые числа)
-   - присядет_за_лагерь: от 500 до 2000 раз (случайные целые числа)
-   - опоздает_минут: от 0 до 120 минут (случайные целые числа)
-   - жалуется_на_душ: True/False (случайный выбор)
-   - заболеет: True/False (случайный выбор)
-   - поймают_с_запрещенкой: True/False (случайный выбор)
-4. Выведите первые 3 строки с помощью `head(3)`
-5. Получите информацию о структуре данных с помощью `info()`
+1. Создайте простые данные и изучите, как меняется линия при разных весах
+2. Постройте несколько линий с разными параметрами
+3. Поймите геометрический смысл весов
 
 ```python
 # Ваш код здесь
-# ВАЖНО: Установите np.random.seed(42) перед генерацией данных
-# 1. Создайте словарь с данными участников лагеря
-# 2. Создайте DataFrame с помощью pd.DataFrame()
-# 3. Выведите первые 3 строки
-# 4. Выведите информацию о DataFrame
+# 1. Создайте x от 0 до 10 с шагом 0.5
+x = np.arange(0, 10, 0.5)
+
+# 2. Постройте 4 разные линии с параметрами:
+# y1 = 2*x + 1 (w=2, b=1)
+# y2 = -1*x + 5 (w=-1, b=5)  
+# y3 = 0.5*x + 2 (w=0.5, b=2)
+# y4 = 3*x - 2 (w=3, b=-2)
+
+# 3. Постройте все линии на одном графике
+# Подпишите каждую линию: f"y = {w}x + {b}"
+# Добавьте legend, xlabel, ylabel, title
+
+# 4. Опишите в комментариях, как влияет:
+# - положительный/отрицательный вес w
+# - большое/маленькое значение смещения b
 ```
 
-### Решение 1.1:
 ```python
-# Устанавливаем сид для воспроизводимости
+# Решение задания 1.1
+# 1. Создаём x от 0 до 10 с шагом 0.5
+x = np.arange(0, 10, 0.5)
+
+# 2. Создаём 4 разные линии с разными параметрами
+y1 = 2*x + 1      # w=2, b=1
+y2 = -1*x + 5     # w=-1, b=5
+y3 = 0.5*x + 2    # w=0.5, b=2
+y4 = 3*x - 2      # w=3, b=-2
+
+# 3. Строим все линии на одном графике
+plt.figure(figsize=(10, 6))
+plt.plot(x, y1, label='y = 2x + 1', linewidth=2)
+plt.plot(x, y2, label='y = -1x + 5', linewidth=2)
+plt.plot(x, y3, label='y = 0.5x + 2', linewidth=2)
+plt.plot(x, y4, label='y = 3x - 2', linewidth=2)
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Примеры линейных функций y = wx + b')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 4. Влияние параметров:
+# - Положительный вес w: линия идёт вверх (возрастающая функция)
+# - Отрицательный вес w: линия идёт вниз (убывающая функция)
+# - Большой |w|: крутой наклон, маленький |w|: пологий наклон
+# - Смещение b: определяет, где линия пересекает ось y при x=0
+print("Влияние параметров:")
+print("w > 0: линия возрастает")
+print("w < 0: линия убывает")
+print("|w| большое: крутой наклон")
+print("|w| маленькое: пологий наклон")
+print("b: точка пересечения с осью y")
+```
+
+### Задание 1.2: Создание данных с шумом и визуализация
+
+**Теория:**
+В реальных данных всегда есть шум - случайные отклонения от идеальной зависимости. Наша задача - найти линию, которая лучше всего описывает общую тенденцию.
+
+**Задание:**
+1. Создайте данные по формуле y = 3*x + 2 + шум
+2. Визуализируйте исходные данные и истинную зависимость
+3. Добавьте разное количество шума и посмотрите на результат
+
+```python
+# Ваш код здесь
+# 1. Создайте x от 0 до 10, 50 точек
 np.random.seed(42)
 
-# Создаем словарь с данными
-camp_data = {
-    'имя': ['Александр', 'Игорь', 'Илья', 'Ярослав', 'Михаил', 'Дарья', 'Мария', 'Александр'],
-    'возраст': np.random.randint(15, 18, 8),
-    'присядет_за_лагерь': np.random.randint(500, 2001, 8),
-    'опоздает_минут': np.random.randint(0, 121, 8),
-    'жалуется_на_душ': np.random.choice([True, False], 8),
-    'заболеет': np.random.choice([True, False], 8),
-    'поймают_с_запрещенкой': np.random.choice([True, False], 8)
+# 2. Создайте "истинную" зависимость: y_true = 3*x + 2
+
+# 3. Добавьте шум: y_noisy = y_true + np.random.normal(0, 1, len(x))
+
+# 4. Постройте график:
+# - scatter plot зашумленных данных
+# - линию истинной зависимости (красная линия)
+# - добавьте легенду и подписи осей
+
+# 5. Создайте еще 2 датасета с разным уровнем шума (std=0.5 и std=2)
+# Постройте их в subplot(1, 3) для сравнения
+```
+
+```python
+# Решение задания 1.2
+# 1. Создаём x от 0 до 10, 50 точек
+np.random.seed(42)
+x = np.linspace(0, 10, 50)
+
+# 2. Создаём истинную зависимость
+y_true = 3*x + 2
+
+# 3. Добавляем шум
+y_noisy = y_true + np.random.normal(0, 1, len(x))
+
+# 4. Строим график основных данных
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.scatter(x, y_noisy, alpha=0.6, label='Данные с шумом')
+plt.plot(x, y_true, 'r-', linewidth=2, label='Истинная зависимость y=3x+2')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Данные с умеренным шумом (std=1)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+# 5. Создаём датасеты с разным уровнем шума
+np.random.seed(42)
+y_low_noise = y_true + np.random.normal(0, 0.5, len(x))
+y_high_noise = y_true + np.random.normal(0, 2, len(x))
+
+plt.subplot(1, 3, 2)
+plt.scatter(x, y_low_noise, alpha=0.6, label='Данные с шумом')
+plt.plot(x, y_true, 'r-', linewidth=2, label='Истинная зависимость')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Слабый шум (std=0.5)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+plt.subplot(1, 3, 3)
+plt.scatter(x, y_high_noise, alpha=0.6, label='Данные с шумом')
+plt.plot(x, y_true, 'r-', linewidth=2, label='Истинная зависимость')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Сильный шум (std=2)')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("Наблюдения:")
+print("- При малом шуме точки близко к истинной линии")
+print("- При большом шуме труднее увидеть зависимость")
+print("- Задача модели - найти истинную зависимость несмотря на шум")
+```
+
+### Задание 1.3: Ручной подбор весов
+
+**Теория:**
+Прежде чем использовать автоматические алгоритмы, попробуем подобрать веса вручную, чтобы понять, как работает процесс обучения.
+
+**Задание:**
+1. Попробуйте разные значения весов и смещений
+2. Вычислите ошибку для каждого варианта
+3. Найдите наилучшие параметры визуально
+
+```python
+# Ваш код здесь
+# Используйте данные из предыдущего задания (x, y_noisy)
+
+# 1. Попробуйте разные веса и смещения:
+weights_to_try = [1, 2, 3, 4, 5]
+biases_to_try = [0, 1, 2, 3, 4]
+
+# 2. Для каждой комбинации:
+# - вычислите предсказания: y_pred = w*x + b  
+# - вычислите MSE: np.mean((y_noisy - y_pred)**2)
+# - сохраните результат
+
+# 3. Найдите комбинацию с минимальной ошибкой
+
+# 4. Постройте график:
+# - исходные данные (scatter)
+# - лучшую найденную линию
+# - истинную линию для сравнения
+# Выведите MSE лучшей модели
+```
+
+```python
+# Решение задания 1.3
+# Используем данные из предыдущего задания
+weights_to_try = [1, 2, 3, 4, 5]
+biases_to_try = [0, 1, 2, 3, 4]
+
+best_mse = float('inf')
+best_w = None
+best_b = None
+results = []
+
+# 1-2. Перебираем все комбинации и вычисляем MSE
+for w in weights_to_try:
+    for b in biases_to_try:
+        # Предсказания
+        y_pred = w * x + b
+        
+        # MSE
+        mse = np.mean((y_noisy - y_pred)**2)
+        results.append((w, b, mse))
+        
+        # Запоминаем лучшую комбинацию
+        if mse < best_mse:
+            best_mse = mse
+            best_w = w
+            best_b = b
+
+# 3. Выводим результаты
+print("Результаты перебора:")
+print("w    b    MSE")
+print("-" * 15)
+for w, b, mse in sorted(results, key=lambda x: x[2]):
+    print(f"{w}  {b}  {mse:.2f}")
+
+print(f"\nЛучшие параметры: w={best_w}, b={best_b}")
+print(f"MSE: {best_mse:.2f}")
+print(f"Истинные параметры: w=3, b=2")
+
+# 4. Строим график сравнения
+y_best = best_w * x + best_b
+
+plt.figure(figsize=(10, 6))
+plt.scatter(x, y_noisy, alpha=0.6, label='Данные с шумом')
+plt.plot(x, y_true, 'r-', linewidth=2, label=f'Истинная линия (y=3x+2)')
+plt.plot(x, y_best, 'g--', linewidth=2, label=f'Лучшая найденная (y={best_w}x+{best_b})')
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Сравнение истинной и найденной зависимостей')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f"Разность с истинными параметрами:")
+print(f"Δw = {abs(best_w - 3)}")
+print(f"Δb = {abs(best_b - 2)}")
+```
+
+### Задание 1.4: Введение в sklearn и автоматическое обучение
+
+**Теория:**
+Sklearn автоматически находит оптимальные веса, минимизируя функцию потерь (обычно MSE - среднеквадратичную ошибку).
+
+**Задание:**
+1. Используйте LinearRegression для автоматического поиска весов
+2. Сравните с вашим ручным подбором
+3. Изучите найденные коэффициенты
+
+```python
+# Ваш код здесь
+# 1. Подготовьте данные: x должен быть двумерным массивом
+X = x.reshape(-1, 1)  # превращаем в столбец
+y = y_noisy
+
+# 2. Создайте и обучите модель
+model = LinearRegression()
+# обучите модель: model.fit(X, y)
+
+# 3. Получите коэффициенты:
+# weight = model.coef_[0]  
+# bias = model.intercept_
+
+# 4. Сделайте предсказания и вычислите MSE
+# y_pred = model.predict(X)
+# mse = mean_squared_error(y, y_pred)
+
+# 5. Постройте график сравнения:
+# - исходные данные
+# - линия sklearn
+# - ваша лучшая ручная линия  
+# - истинная линия
+
+# 6. Выведите найденные параметры и сравните их с истинными (w=3, b=2)
+```
+
+```python
+# Решение задания 1.4
+# 1. Подготавливаем данные для sklearn
+X = x.reshape(-1, 1)  # превращаем в столбец
+y = y_noisy
+
+# 2. Создаём и обучаем модель
+model = LinearRegression()
+model.fit(X, y)
+
+# 3. Получаем коэффициенты
+weight = model.coef_[0]  
+bias = model.intercept_
+
+# 4. Делаем предсказания и вычисляем MSE
+y_pred = model.predict(X)
+mse_sklearn = mean_squared_error(y, y_pred)
+
+print("СРАВНЕНИЕ РЕЗУЛЬТАТОВ:")
+print("=" * 30)
+print(f"Истинные параметры:    w=3.00, b=2.00")
+print(f"Ручной подбор:         w={best_w}.00, b={best_b}.00, MSE={best_mse:.2f}")
+print(f"Sklearn LinearRegression: w={weight:.2f}, b={bias:.2f}, MSE={mse_sklearn:.2f}")
+
+# 5. Строим график сравнения
+y_sklearn = weight * x + bias
+
+plt.figure(figsize=(12, 6))
+plt.scatter(x, y_noisy, alpha=0.6, label='Данные с шумом')
+plt.plot(x, y_true, 'r-', linewidth=2, label='Истинная линия (y=3x+2)')
+plt.plot(x, y_best, 'g--', linewidth=2, label=f'Ручной подбор (y={best_w}x+{best_b})')
+plt.plot(x, y_sklearn, 'b:', linewidth=3, label=f'Sklearn (y={weight:.2f}x+{bias:.2f})')
+
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Сравнение методов поиска параметров')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# 6. Анализ точности
+print(f"\nТочность относительно истинных параметров:")
+print(f"Ручной подбор: |Δw|={abs(best_w - 3):.2f}, |Δb|={abs(best_b - 2):.2f}")
+print(f"Sklearn:       |Δw|={abs(weight - 3):.2f}, |Δb|={abs(bias - 2):.2f}")
+print(f"\nSklearn нашёл более точные параметры!")
+```
+
+---
+
+## Блок 2: Работа с многомерными данными
+
+### Задание 2.1: Модель с несколькими признаками
+
+**Теория:**
+В реальности у нас обычно больше одного признака. Модель становится:
+**y = w₁*x₁ + w₂*x₂ + w₃*x₃ + ... + b**
+
+Каждый признак имеет свой вес, который показывает, насколько сильно этот признак влияет на результат.
+
+**Задание:**
+1. Создайте данные с 3 признаками
+2. Изучите влияние каждого признака отдельно
+3. Обучите модель и проанализируйте веса
+
+```python
+# Ваш код здесь
+# 1. Создайте синтетические данные:
+np.random.seed(42)
+n_samples = 100
+
+# Признаки
+x1 = np.random.uniform(0, 10, n_samples)      # возраст (условно)
+x2 = np.random.uniform(1, 5, n_samples)       # опыт работы  
+x3 = np.random.uniform(0, 1, n_samples)       # образование (0-1)
+
+# Целевая переменная (например, зарплата)
+# y = 2*возраст + 5*опыт + 10*образование + 20 + шум
+y_true = 2*x1 + 5*x2 + 10*x3 + 20
+y = y_true + np.random.normal(0, 2, n_samples)
+
+# 2. Создайте X матрицу признаков
+X = np.column_stack([x1, x2, x3])
+
+# 3. Постройте 3 графика зависимости y от каждого признака отдельно
+# subplot(1, 3, figsize=(15, 5))
+
+# 4. Обучите LinearRegression и выведите веса
+# Сравните найденные веса с истинными [2, 5, 10]
+```
+
+```python
+# Решение задания 2.1
+# 1. Создаём синтетические данные
+np.random.seed(42)
+n_samples = 100
+
+# Признаки
+x1 = np.random.uniform(0, 10, n_samples)      # возраст (условно)
+x2 = np.random.uniform(1, 5, n_samples)       # опыт работы  
+x3 = np.random.uniform(0, 1, n_samples)       # образование (0-1)
+
+# Целевая переменная (например, зарплата)
+y_true = 2*x1 + 5*x2 + 10*x3 + 20
+y = y_true + np.random.normal(0, 2, n_samples)
+
+# 2. Создаём матрицу признаков
+X = np.column_stack([x1, x2, x3])
+
+# 3. Строим графики зависимости от каждого признака
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.scatter(x1, y, alpha=0.6)
+plt.xlabel('Возраст')
+plt.ylabel('Зарплата')
+plt.title('Зависимость от возраста')
+plt.grid(True, alpha=0.3)
+
+plt.subplot(1, 3, 2)
+plt.scatter(x2, y, alpha=0.6)
+plt.xlabel('Опыт работы')
+plt.ylabel('Зарплата')
+plt.title('Зависимость от опыта')
+plt.grid(True, alpha=0.3)
+
+plt.subplot(1, 3, 3)
+plt.scatter(x3, y, alpha=0.6)
+plt.xlabel('Образование (0-1)')
+plt.ylabel('Зарплата')
+plt.title('Зависимость от образования')
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# 4. Обучаем модель и анализируем веса
+model_multi = LinearRegression()
+model_multi.fit(X, y)
+
+weights = model_multi.coef_
+bias = model_multi.intercept_
+
+print("СРАВНЕНИЕ ВЕСОВ:")
+print("=" * 25)
+print("Признак         | Истинный | Найденный | Разность")
+print("-" * 50)
+feature_names = ['Возраст', 'Опыт', 'Образование']
+true_weights = [2, 5, 10]
+
+for i, (name, true_w, found_w) in enumerate(zip(feature_names, true_weights, weights)):
+    diff = abs(true_w - found_w)
+    print(f"{name:15s} | {true_w:8.1f} | {found_w:9.2f} | {diff:8.2f}")
+
+print(f"\nСмещение (bias):")
+print(f"Истинное: 20.00")
+print(f"Найденное: {bias:.2f}")
+print(f"Разность: {abs(20 - bias):.2f}")
+
+# Оценка качества
+y_pred = model_multi.predict(X)
+mse = mean_squared_error(y, y_pred)
+print(f"\nMSE модели: {mse:.2f}")
+```
+
+### Задание 2.2: Влияние масштаба признаков
+
+**Теория:**
+Если признаки имеют очень разные масштабы, это может повлиять на веса модели. Например, возраст (20-60) и зарплата (20000-100000) имеют разные порядки.
+
+**Задание:**
+1. Создайте данные с признаками разного масштаба
+2. Обучите модель без масштабирования
+3. Примените StandardScaler и сравните результаты
+
+```python
+# Ваш код здесь
+# 1. Создайте данные с разными масштабами:
+np.random.seed(42)
+age = np.random.uniform(20, 60, 100)           # возраст: 20-60
+income = np.random.uniform(20000, 100000, 100) # доход: 20k-100k  
+experience = np.random.uniform(0, 40, 100)     # опыт: 0-40 лет
+
+# Целевая переменная (например, стоимость страховки)
+y = 0.1*age + 0.0001*income + 2*experience + 100 + np.random.normal(0, 10, 100)
+
+# 2. Обучите модель БЕЗ масштабирования
+X_raw = np.column_stack([age, income, experience])
+model_raw = LinearRegression()
+# обучите и получите коэффициенты
+
+# 3. Примените StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_raw)
+model_scaled = LinearRegression()
+# обучите на масштабированных данных
+
+# 4. Сравните коэффициенты и MSE
+# Постройте bar plot коэффициентов до и после масштабирования
+
+# 5. Объясните, почему коэффициенты изменились
+```
+
+```python
+# Решение задания 2.2
+# 1. Создаём данные с разными масштабами
+np.random.seed(42)
+age = np.random.uniform(20, 60, 100)           # возраст: 20-60
+income = np.random.uniform(20000, 100000, 100) # доход: 20k-100k  
+experience = np.random.uniform(0, 40, 100)     # опыт: 0-40 лет
+
+# Целевая переменная (стоимость страховки)
+y = 0.1*age + 0.0001*income + 2*experience + 100 + np.random.normal(0, 10, 100)
+
+print("Масштабы признаков:")
+print(f"Возраст: {age.min():.1f} - {age.max():.1f}")
+print(f"Доход: {income.min():.0f} - {income.max():.0f}")
+print(f"Опыт: {experience.min():.1f} - {experience.max():.1f}")
+
+# 2. Обучаем модель БЕЗ масштабирования
+X_raw = np.column_stack([age, income, experience])
+model_raw = LinearRegression()
+model_raw.fit(X_raw, y)
+
+weights_raw = model_raw.coef_
+mse_raw = mean_squared_error(y, model_raw.predict(X_raw))
+
+# 3. Применяем StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_raw)
+model_scaled = LinearRegression()
+model_scaled.fit(X_scaled, y)
+
+weights_scaled = model_scaled.coef_
+mse_scaled = mean_squared_error(y, model_scaled.predict(X_scaled))
+
+# 4. Сравниваем результаты
+feature_names = ['Возраст', 'Доход', 'Опыт']
+true_weights = [0.1, 0.0001, 2.0]
+
+print("\nСРАВНЕНИЕ РЕЗУЛЬТАТОВ:")
+print("=" * 60)
+print("Признак    | Истинный | Без масштаб. | С масштаб. | Разн.1 | Разн.2")
+print("-" * 70)
+
+for i, name in enumerate(feature_names):
+    true_w = true_weights[i]
+    raw_w = weights_raw[i]
+    scaled_w = weights_scaled[i]
+    diff1 = abs(true_w - raw_w)
+    diff2 = abs(true_w - scaled_w)
+    print(f"{name:10s} | {true_w:8.4f} | {raw_w:12.6f} | {scaled_w:10.4f} | {diff1:6.4f} | {diff2:6.4f}")
+
+print(f"\nMSE без масштабирования: {mse_raw:.2f}")
+print(f"MSE с масштабированием:  {mse_scaled:.2f}")
+
+# Визуализация коэффициентов
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+x_pos = np.arange(len(feature_names))
+plt.bar(x_pos - 0.2, weights_raw, 0.4, label='Без масштабирования', alpha=0.7)
+plt.bar(x_pos + 0.2, true_weights, 0.4, label='Истинные', alpha=0.7)
+plt.xticks(x_pos, feature_names)
+plt.ylabel('Значение коэффициента')
+plt.title('Коэффициенты без масштабирования')
+plt.legend()
+plt.yscale('symlog')  # логарифмическая шкала из-за разных порядков
+
+plt.subplot(1, 2, 2)
+plt.bar(x_pos, weights_scaled, alpha=0.7)
+plt.xticks(x_pos, feature_names)
+plt.ylabel('Значение коэффициента')
+plt.title('Коэффициенты после масштабирования')
+
+plt.tight_layout()
+plt.show()
+
+print("\nОБЪЯСНЕНИЕ:")
+print("- Без масштабирования: коэффициент дохода очень маленький")
+print("  из-за большого масштаба признака (тысячи)")
+print("- С масштабированием: все коэффициенты сопоставимы по величине")
+print("- Качество модели (MSE) не изменилось - модель одинаково хорошо предсказывает")
+```
+
+### Задание 2.3: Интерпретация весов модели
+
+**Теория:**
+Веса модели показывают, как изменится целевая переменная при изменении признака на единицу (при условии, что остальные признаки не изменяются).
+
+**Задание:**
+1. Обучите модель на осмысленных данных
+2. Проинтерпретируйте каждый вес
+3. Найдите самые важные признаки
+
+```python
+# Ваш код здесь
+# 1. Создайте реалистичные данные о недвижимости:
+np.random.seed(42)
+n_houses = 200
+
+площадь = np.random.uniform(50, 200, n_houses)        # кв.м
+комнаты = np.random.randint(1, 6, n_houses)           # количество
+этаж = np.random.randint(1, 20, n_houses)             # этаж
+расстояние_центр = np.random.uniform(1, 50, n_houses) # км от центра
+
+# Цена квартиры (тыс. руб)
+цена = (площадь * 100 +           # 100 тыс за кв.м
+        комнаты * 500 +           # 500 тыс за комнату  
+        этаж * 10 -                # 10 тыс за этаж
+        расстояние_центр * 20 +    # -20 тыс за км от центра
+        5000 +                     # базовая цена
+        np.random.normal(0, 500, n_houses))  # шум
+
+# 2. Обучите модель
+X = np.column_stack([площадь, комнаты, этаж, расстояние_центр])
+feature_names = ['Площадь', 'Комнаты', 'Этаж', 'Расстояние от центра']
+
+# 3. Создайте bar plot весов с подписями признаков
+
+# 4. Выведите интерпретацию каждого веса:
+# "При увеличении площади на 1 кв.м цена увеличивается на X тыс. руб"
+
+# 5. Ранжируйте признаки по важности (по абсолютному значению весов)
+```
+
+```python
+# Решение задания 2.3
+# 1. Создаём реалистичные данные о недвижимости
+np.random.seed(42)
+n_houses = 200
+
+площадь = np.random.uniform(50, 200, n_houses)        # кв.м
+комнаты = np.random.randint(1, 6, n_houses)           # количество
+этаж = np.random.randint(1, 20, n_houses)             # этаж
+расстояние_центр = np.random.uniform(1, 50, n_houses) # км от центра
+
+# Цена квартиры (тыс. руб)
+цена = (площадь * 100 +           # 100 тыс за кв.м
+        комнаты * 500 +           # 500 тыс за комнату  
+        этаж * 10 +                # 10 тыс за этаж
+        расстояние_центр * (-20) + # -20 тыс за км от центра
+        5000 +                     # базовая цена
+        np.random.normal(0, 500, n_houses))  # шум
+
+# 2. Обучаем модель
+X = np.column_stack([площадь, комнаты, этаж, расстояние_центр])
+feature_names = ['Площадь', 'Комнаты', 'Этаж', 'Расстояние от центра']
+
+model_house = LinearRegression()
+model_house.fit(X, цена)
+
+weights = model_house.coef_
+bias = model_house.intercept_
+true_weights = [100, 500, 10, -20]
+
+# 3. Строим bar plot весов
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 2, 1)
+colors = ['red' if w < 0 else 'blue' for w in weights]
+bars = plt.bar(feature_names, weights, color=colors, alpha=0.7)
+plt.ylabel('Вес признака (тыс. руб.)')
+plt.title('Веса признаков в модели цены недвижимости')
+plt.xticks(rotation=45)
+plt.grid(True, alpha=0.3)
+
+# Добавляем значения на столбцы
+for bar, weight in zip(bars, weights):
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height + (50 if height > 0 else -50),
+             f'{weight:.1f}', ha='center', va='bottom' if height > 0 else 'top')
+
+plt.subplot(1, 2, 2)
+importance = np.abs(weights)
+sorted_idx = np.argsort(importance)[::-1]
+plt.barh(range(len(feature_names)), importance[sorted_idx])
+plt.yticks(range(len(feature_names)), [feature_names[i] for i in sorted_idx])
+plt.xlabel('Важность (|вес|)')
+plt.title('Ранжирование признаков по важности')
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# 4. Интерпретация каждого веса
+print("ИНТЕРПРЕТАЦИЯ ВЕСОВ:")
+print("=" * 50)
+print(f"Базовая цена: {bias:.0f} тыс. руб.")
+print()
+
+interpretations = [
+    "При увеличении площади на 1 кв.м цена увеличивается на {:.1f} тыс. руб.",
+    "При добавлении 1 комнаты цена увеличивается на {:.1f} тыс. руб.",
+    "При подъёме на 1 этаж цена изменяется на {:.1f} тыс. руб.",
+    "При удалении от центра на 1 км цена изменяется на {:.1f} тыс. руб."
+]
+
+for name, weight, interpretation, true_weight in zip(feature_names, weights, interpretations, true_weights):
+    print(f"{name}:")
+    print(f"  {interpretation.format(weight)}")
+    print(f"  Истинное влияние: {true_weight} тыс. руб.")
+    print(f"  Ошибка: {abs(weight - true_weight):.1f} тыс. руб.")
+    print()
+
+# 5. Ранжирование по важности
+print("РАНЖИРОВАНИЕ ПО ВАЖНОСТИ:")
+print("=" * 30)
+importance_ranking = sorted(zip(feature_names, weights, np.abs(weights)), 
+                          key=lambda x: x[2], reverse=True)
+
+for i, (name, weight, importance) in enumerate(importance_ranking, 1):
+    print(f"{i}. {name}: {weight:+.1f} тыс. руб. (важность: {importance:.1f})")
+
+# Качество модели
+y_pred = model_house.predict(X)
+mse = mean_squared_error(цена, y_pred)
+print(f"\nКачество модели MSE: {mse:.2f}")
+print("Модель хорошо восстановила истинные зависимости!")
+```
+
+---
+
+## Блок 3: Кодирование категориальных признаков
+
+### Задание 3.1: Проблема с категориальными данными
+
+**Теория:**
+Линейная регрессия работает только с числами. Если у нас есть категориальные признаки (пол, город, образование), их нужно преобразовать в числа.
+
+**НЕ ПРАВИЛЬНО:** просто присвоить числа (Мужчина=1, Женщина=2) - это создает ложный порядок.
+
+**ПРАВИЛЬНО:** использовать One-Hot Encoding - создать отдельную колонку для каждой категории.
+
+**Задание:**
+1. Создайте данные с категориальными признаками
+2. Покажите проблему с обычным кодированием
+3. Сравните с правильным подходом
+
+```python
+# Ваш код здесь
+# 1. Создайте данные о сотрудниках:
+np.random.seed(42)
+n_people = 150
+
+возраст = np.random.uniform(25, 55, n_people)
+опыт = np.random.uniform(0, 30, n_people)
+
+# Категориальные признаки
+пол = np.random.choice(['Мужчина', 'Женщина'], n_people)
+образование = np.random.choice(['Среднее', 'Высшее', 'Магистр'], n_people)
+
+# Зарплата зависит от всех факторов
+зарплата_базовая = (возраст * 1000 + опыт * 2000 + 30000)
+
+# Добавляем влияние пола и образования
+пол_бонус = np.where(пол == 'Мужчина', 5000, 0)  # условный пример
+
+образование_бонус = np.select([
+    образование == 'Среднее',
+    образование == 'Высшее', 
+    образование == 'Магистр'
+], [0, 10000, 20000])
+
+зарплата = зарплата_базовая + пол_бонус + образование_бонус + np.random.normal(0, 3000, n_people)
+
+# 2. НЕПРАВИЛЬНЫЙ способ - LabelEncoder
+le_пол = LabelEncoder()
+пол_числа = le_пол.fit_transform(пол)  # Женщина=0, Мужчина=1
+
+le_образование = LabelEncoder()  
+образование_числа = le_образование.fit_transform(образование)  # Высшее=0, Магистр=1, Среднее=2
+
+# Обучите модель с неправильным кодированием
+X_wrong = np.column_stack([возраст, опыт, пол_числа, образование_числа])
+
+# 3. Выведите веса и объясните, почему они могут быть неправильными
+```
+
+```python
+# Решение задания 3.1
+# 1. Создаём данные о сотрудниках
+np.random.seed(42)
+n_people = 150
+
+возраст = np.random.uniform(25, 55, n_people)
+опыт = np.random.uniform(0, 30, n_people)
+
+# Категориальные признаки
+пол = np.random.choice(['Мужчина', 'Женщина'], n_people)
+образование = np.random.choice(['Среднее', 'Высшее', 'Магистр'], n_people)
+
+# Зарплата зависит от всех факторов
+зарплата_базовая = (возраст * 1000 + опыт * 2000 + 30000)
+
+# Добавляем влияние пола и образования
+пол_бонус = np.where(пол == 'Мужчина', 5000, 0)
+
+образование_бонус = np.select([
+    образование == 'Среднее',
+    образование == 'Высшее', 
+    образование == 'Магистр'
+], [0, 10000, 20000])
+
+зарплата = зарплата_базовая + пол_бонус + образование_бонус + np.random.normal(0, 3000, n_people)
+
+print("ИСТИННЫЕ ЗАВИСИМОСТИ:")
+print("Мужчина: +5000 к зарплате")
+print("Среднее образование: +0")
+print("Высшее образование: +10000") 
+print("Магистр: +20000")
+
+# 2. НЕПРАВИЛЬНЫЙ способ - LabelEncoder
+le_пол = LabelEncoder()
+пол_числа = le_пол.fit_transform(пол)
+
+le_образование = LabelEncoder()  
+образование_числа = le_образование.fit_transform(образование)
+
+print(f"\nКодирование пола: {dict(zip(le_пол.classes_, range(len(le_пол.classes_))))}")
+print(f"Кодирование образования: {dict(zip(le_образование.classes_, range(len(le_образование.classes_))))}")
+
+# Обучаем модель с неправильным кодированием
+X_wrong = np.column_stack([возраст, опыт, пол_числа, образование_числа])
+model_wrong = LinearRegression()
+model_wrong.fit(X_wrong, зарплата)
+
+weights_wrong = model_wrong.coef_
+feature_names_wrong = ['Возраст', 'Опыт', 'Пол (0/1)', 'Образование (0/1/2)']
+
+print("\nРЕЗУЛЬТАТЫ НЕПРАВИЛЬНОГО КОДИРОВАНИЯ:")
+print("=" * 45)
+for name, weight in zip(feature_names_wrong, weights_wrong):
+    print(f"{name}: {weight:.2f}")
+
+# 3. Анализ проблем
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.bar(feature_names_wrong, weights_wrong)
+plt.title('Веса при неправильном кодировании')
+plt.ylabel('Вес')
+plt.xticks(rotation=45)
+
+plt.subplot(1, 2, 2)
+# Показываем проблему с образованием
+education_codes = sorted(zip(le_образование.classes_, range(len(le_образование.classes_))))
+plt.bar([f"{edu}({code})" for edu, code in education_codes], 
+        [0, 10000, 20000], alpha=0.7, label='Истинное влияние')
+plt.title('Проблема: неравные интервалы')
+plt.ylabel('Влияние на зарплату')
+plt.xticks(rotation=45)
+plt.legend()
+
+plt.tight_layout()
+plt.show()
+
+print("\nПРОБЛЕМЫ НЕПРАВИЛЬНОГО КОДИРОВАНИЯ:")
+print("1. Создаётся ложный порядок: Высшее(0) < Магистр(1) < Среднее(2)")
+print("2. Модель думает, что разность Магистр-Высшее = Среднее-Магистр")
+print("3. На самом деле влияние образования: Среднее(0) < Высшее(10к) < Магистр(20к)")
+print("4. Числовое кодирование не отражает реальные отношения между категориями")
+```
+
+### Задание 3.2: One-Hot Encoding - правильный способ
+
+**Теория:**
+One-Hot Encoding создает отдельную бинарную колонку для каждой категории:
+
+Пол: Мужчина → [1, 0], Женщина → [0, 1]
+Образование: Среднее → [1, 0, 0], Высшее → [0, 1, 0], Магистр → [0, 0, 1]
+
+**Задание:**
+1. Примените One-Hot Encoding к тем же данным
+2. Сравните результаты с предыдущим подходом
+3. Проинтерпретируйте новые веса
+
+```python
+# Ваш код здесь
+# Используйте данные из предыдущего задания
+
+# 1. Примените OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+# Для пола
+ohe_пол = OneHotEncoder(sparse_output=False, drop='first')  # drop='first' избегает мультиколлинеарности
+пол_onehot = ohe_пол.fit_transform(пол.reshape(-1, 1))
+
+# Для образования  
+ohe_образование = OneHotEncoder(sparse_output=False, drop='first')
+образование_onehot = ohe_образование.fit_transform(образование.reshape(-1, 1))
+
+# 2. Создайте матрицу признаков
+X_correct = np.column_stack([возраст, опыт, пол_onehot, образование_onehot])
+
+# 3. Обучите модель
+model_correct = LinearRegression()
+model_correct.fit(X_correct, зарплата)
+
+# 4. Создайте названия признаков для интерпретации
+feature_names = ['Возраст', 'Опыт'] + list(ohe_пол.get_feature_names_out(['Пол'])) + list(ohe_образование.get_feature_names_out(['Образование']))
+
+# 5. Постройте bar plot весов с подписями
+# Проинтерпретируйте веса категориальных признаков
+
+# 6. Сравните MSE между правильным и неправильным кодированием
+```
+
+```python
+# Решение задания 3.2
+# Используем данные из предыдущего задания
+
+# 1. Применяем OneHotEncoder
+# Для пола
+ohe_пол = OneHotEncoder(sparse_output=False, drop='first')
+пол_onehot = ohe_пол.fit_transform(пол.reshape(-1, 1))
+
+# Для образования  
+ohe_образование = OneHotEncoder(sparse_output=False, drop='first')
+образование_onehot = ohe_образование.fit_transform(образование.reshape(-1, 1))
+
+print("ONE-HOT ENCODING:")
+print(f"Пол - базовая категория (drop): {ohe_пол.categories_[0][0]}")
+print(f"Пол - кодируемая категория: {ohe_пол.categories_[0][1]}")
+print(f"Образование - базовая категория: {ohe_образование.categories_[0][0]}")
+print(f"Образование - кодируемые категории: {ohe_образование.categories_[0][1:]}")
+
+# 2. Создаём матрицу признаков
+X_correct = np.column_stack([возраст, опыт, пол_onehot, образование_onehot])
+
+# 3. Обучаем модель
+model_correct = LinearRegression()
+model_correct.fit(X_correct, зарплата)
+
+weights_correct = model_correct.coef_
+bias_correct = model_correct.intercept_
+
+# 4. Создаём названия признаков
+feature_names = (['Возраст', 'Опыт'] + 
+                list(ohe_пол.get_feature_names_out(['Пол'])) + 
+                list(ohe_образование.get_feature_names_out(['Образование'])))
+
+print(f"\nПризнаки после One-Hot Encoding: {feature_names}")
+
+# 5. Строим график весов и интерпретируем
+plt.figure(figsize=(14, 6))
+
+plt.subplot(1, 2, 1)
+colors = ['blue', 'blue', 'red', 'green', 'green']
+bars = plt.bar(range(len(weights_correct)), weights_correct, color=colors, alpha=0.7)
+plt.xticks(range(len(feature_names)), feature_names, rotation=45)
+plt.ylabel('Вес признака')
+plt.title('Веса при правильном One-Hot кодировании')
+plt.grid(True, alpha=0.3)
+
+# Добавляем значения на столбцы
+for bar, weight in zip(bars, weights_correct):
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height + (200 if height > 0 else -200),
+             f'{weight:.0f}', ha='center', va='bottom' if height > 0 else 'top')
+
+# Сравнение MSE
+mse_wrong = mean_squared_error(зарплата, model_wrong.predict(X_wrong))
+mse_correct = mean_squared_error(зарплата, model_correct.predict(X_correct))
+
+plt.subplot(1, 2, 2)
+methods = ['Неправильное\nкодирование', 'One-Hot\nEncoding']
+mse_values = [mse_wrong, mse_correct]
+bars = plt.bar(methods, mse_values, color=['red', 'green'], alpha=0.7)
+plt.ylabel('MSE')
+plt.title('Сравнение качества моделей')
+
+for bar, mse in zip(bars, mse_values):
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height + height*0.01,
+             f'{mse:.0f}', ha='center', va='bottom')
+
+plt.tight_layout()
+plt.show()
+
+# 6. Интерпретация весов
+print("\nИНТЕРПРЕТАЦИЯ ВЕСОВ (One-Hot Encoding):")
+print("=" * 50)
+print(f"Базовая зарплата: {bias_correct:.0f} руб.")
+print("(для женщины с высшим образованием)")
+print()
+
+interpretations = {
+    'Возраст': 'За каждый год возраста: +{:.0f} руб.',
+    'Опыт': 'За каждый год опыта: +{:.0f} руб.',
+    'Пол_Мужчина': 'Мужчина vs Женщина: +{:.0f} руб.',
+    'Образование_Магистр': 'Магистр vs Высшее: +{:.0f} руб.',
+    'Образование_Среднее': 'Среднее vs Высшее: {:.0f} руб.'
 }
 
-# Создаем DataFrame
-df_camp = pd.DataFrame(camp_data)
-print("DataFrame участников лагеря:")
-print(df_camp)
+for name, weight in zip(feature_names, weights_correct):
+    if name in interpretations:
+        print(interpretations[name].format(weight))
 
-print("\\nПервые 3 строки:")
-print(df_camp.head(3))
+print(f"\nСравнение качества:")
+print(f"MSE неправильного кодирования: {mse_wrong:.2f}")
+print(f"MSE One-Hot Encoding: {mse_correct:.2f}")
+print(f"Улучшение: {((mse_wrong - mse_correct) / mse_wrong * 100):.1f}%")
 
-print("\\nИнформация о DataFrame:")
-print(df_camp.info())
+# Проверяем соответствие истинным значениям
+print(f"\nСоответствие истинным зависимостям:")
+print(f"Мужчина бонус: истинный = +5000, найденный = +{weights_correct[2]:.0f}")
+print(f"Магистр бонус: истинный = +20000, найденный = +{weights_correct[4]:.0f}")
+print(f"Среднее бонус: истинный = -10000, найденный = {weights_correct[3]:.0f}")
 ```
 
-### Задание 1.2: Создание DataFrame из списков и сохранение в CSV
+### Задание 3.3: Работа с ColumnTransformer
 
 **Теория:**
-DataFrame можно создавать не только из словарей, но и из списков. Pandas позволяет сохранять данные в различных форматах, включая CSV.
+ColumnTransformer позволяет применять разные виды предобработки к разным типам признаков одновременно.
 
 **Задание:**
-1. Создайте DataFrame из списка списков с данными о комнатах в лагере
-2. Используйте данные: [1, 4, True], [2, 3, False], [3, 5, True], [4, 2, False]
-3. Назовите столбцы: 'номер_комнаты', 'количество_человек', 'есть_балкон'
-4. Сохраните этот DataFrame в файл 'rooms.csv'
-5. Загрузите данные обратно и проверьте корректность
+1. Создайте данные со смешанными типами признаков
+2. Используйте ColumnTransformer для автоматической обработки
+3. Создайте полный pipeline
 
 ```python
 # Ваш код здесь
-# 1. Создайте DataFrame из списка списков
-# 2. Назначьте названия столбцов
-# 3. Сохраните в CSV с помощью to_csv()
-# 4. Загрузите обратно с помощью pd.read_csv()
+# 1. Создайте DataFrame с разными типами данных
+data = pd.DataFrame({
+    'возраст': возраст,
+    'опыт': опыт,
+    'пол': пол,
+    'образование': образование,
+    'зарплата': зарплата
+})
+
+# 2. Разделите на признаки и целевую переменную
+X = data.drop('зарплата', axis=1)
+y = data['зарплата']
+
+# 3. Определите числовые и категориальные признаки
+numeric_features = ['возраст', 'опыт']
+categorical_features = ['пол', 'образование']
+
+# 4. Создайте ColumnTransformer
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(drop='first'), categorical_features)
+    ])
+
+# 5. Создайте Pipeline
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('regressor', LinearRegression())
+])
+
+# 6. Разделите данные на train/test и обучите pipeline
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 7. Обучите и оцените модель
+# Выведите MSE на train и test
 ```
 
-### Решение 1.2:
 ```python
-# 1. Создаем DataFrame из списка списков
-rooms_data = [[1, 4, True], [2, 3, False], [3, 5, True], [4, 2, False]]
-df_rooms = pd.DataFrame(rooms_data, columns=['номер_комнаты', 'количество_человек', 'есть_балкон'])
-
-print("DataFrame комнат:")
-print(df_rooms)
-
-# 2. Сохраняем в CSV
-df_rooms.to_csv('rooms.csv', index=False, encoding='utf-8')
-print("\\nДанные сохранены в rooms.csv")
-
-# 3. Загружаем обратно
-df_rooms_loaded = pd.read_csv('rooms.csv')
-print("\\nДанные загружены из CSV:")
-print(df_rooms_loaded)
-print("\\nТипы данных после загрузки:")
-print(df_rooms_loaded.dtypes)
-```
-
-### Задание 1.3: Просмотр структуры данных
-
-**Теория:**
-Для анализа данных важно понимать их структуру. Основные методы: `head()`, `tail()`, `info()`, `describe()`, `shape`, `columns`.
-
-**Задание:**
-1. Выведите последние 3 строки данных участников лагеря с помощью `tail(3)`
-2. Получите описательную статистику для числовых столбцов
-3. Выведите названия всех столбцов
-4. Узнайте размер DataFrame (количество строк и столбцов)
-5. Посмотрите на уникальные значения в столбце 'возраст'
-
-```python
-# Ваш код здесь
-# 1. Последние 3 строки с помощью tail()
-# 2. Описательная статистика с помощью describe()
-# 3. Названия столбцов
-# 4. Размер DataFrame с помощью shape
-# 5. Уникальные значения возраста
-```
-
-### Решение 1.3:
-```python
-# 1. Последние 3 строки
-print("Последние 3 строки:")
-print(df_camp.tail(3))
-
-# 2. Описательная статистика
-print("\\nОписательная статистика:")
-print(df_camp.describe())
-
-# 3. Названия столбцов
-print("\\nНазвания столбцов:")
-print(df_camp.columns.tolist())
-
-# 4. Размер DataFrame
-print(f"\\nРазмер DataFrame: {df_camp.shape[0]} строк, {df_camp.shape[1]} столбцов")
-
-# 5. Уникальные значения возраста
-print("\\nУникальные значения возраста:")
-print(sorted(df_camp['возраст'].unique()))
-print(f"Количество уникальных возрастов: {df_camp['возраст'].nunique()}")
-```
-
-### Задание 1.4: Индексация и выбор данных (loc, iloc, условная фильтрация)
-
-**Теория:**
-Для выбора данных в pandas используются:
-- `loc[]` - по названиям строк/столбцов
-- `iloc[]` - по числовым индексам
-- Условная фильтрация с помощью булевых масок
-
-**Задание:**
-1. Выберите данные участника с индексом 2 с помощью `iloc`
-2. Выберите столбцы 'имя' и 'возраст' для всех участников с помощью `loc`
-3. Найдите всех участников старше 16 лет
-4. Найдите участников, которые и заболеют, и будут пойманы с запрещенкой
-5. Выберите имена участников, которые присядут больше 1500 раз
-
-```python
-# Ваш код здесь
-# 1. Данные участника с индексом 2 (iloc)
-# 2. Столбцы имя и возраст для всех участников (loc)
-# 3. Участники старше 16 лет
-# 4. Участники с двумя "проблемами"
-# 5. Имена "спортсменов"
-```
-
-### Решение 1.4:
-```python
-# 1. Участник с индексом 2
-print("Участник с индексом 2:")
-print(df_camp.iloc[2])
-
-# 2. Столбцы имя и возраст
-print("\\nИмена и возраст всех участников:")
-print(df_camp.loc[:, ['имя', 'возраст']])
-
-# 3. Участники старше 16 лет
-older_participants = df_camp[df_camp['возраст'] > 16]
-print("\\nУчастники старше 16 лет:")
-print(older_participants[['имя', 'возраст']])
-
-# 4. Участники с двумя "проблемами"
-problematic = df_camp[(df_camp['заболеет'] == True) & (df_camp['поймают_с_запрещенкой'] == True)]
-print("\\nУчастники, которые заболеют И будут пойманы с запрещенкой:")
-print(problematic['имя'].tolist())
-
-# 5. "Спортсмены" (много приседаний)
-athletes = df_camp[df_camp['присядет_за_лагерь'] > 1500]['имя']
-print("\\nУчастники, которые присядут больше 1500 раз:")
-print(athletes.tolist())
-```
-
-### Задание 1.5: Сортировка данных
-
-**Теория:**
-Сортировка данных выполняется с помощью метода `sort_values()`. Можно сортировать по одному или нескольким столбцам, в возрастающем или убывающем порядке.
-
-**Задание:**
-1. Отсортируйте участников по возрасту (по возрастанию)
-2. Отсортируйте по количеству опозданий (по убыванию)
-3. Выполните сортировку сначала по возрасту, затем по количеству приседаний (оба по убыванию)
-4. Найдите топ-3 участников по количеству приседаний
-
-```python
-# Ваш код здесь
-# 1. Сортировка по возрасту
-# 2. Сортировка по опозданиям (убывание)
-# 3. Двойная сортировка
-# 4. Топ-3 по приседаниям
-```
-
-### Решение 1.5:
-```python
-# 1. Сортировка по возрасту
-print("Участники, отсортированные по возрасту:")
-age_sorted = df_camp.sort_values('возраст')
-print(age_sorted[['имя', 'возраст']])
-
-# 2. Сортировка по опозданиям (убывание)
-print("\\nУчастники по количеству опозданий (убывание):")
-late_sorted = df_camp.sort_values('опоздает_минут', ascending=False)
-print(late_sorted[['имя', 'опоздает_минут']])
-
-# 3. Двойная сортировка
-print("\\nСортировка по возрасту, затем по приседаниям (убывание):")
-double_sorted = df_camp.sort_values(['возраст', 'присядет_за_лагерь'], ascending=[False, False])
-print(double_sorted[['имя', 'возраст', 'присядет_за_лагерь']])
-
-# 4. Топ-3 по приседаниям
-print("\\nТоп-3 по количеству приседаний:")
-top_athletes = df_camp.nlargest(3, 'присядет_за_лагерь')
-print(top_athletes[['имя', 'присядет_за_лагерь']])
-```
-
-### Задание 1.6: Работа с пропущенными значениями
-
-**Теория:**
-В реальных данных часто встречаются пропущенные значения (NaN). Pandas предоставляет инструменты для их обнаружения и обработки.
-
-**Задание:**
-1. Создайте копию DataFrame и добавьте несколько пропущенных значений
-2. Найдите пропущенные значения с помощью `isnull()`
-3. Заполните пропущенные числовые значения средним значением столбца
-4. Заполните пропущенные булевы значения значением False
-5. Удалите строки с пропущенными значениями в именах (если такие есть)
-
-```python
-# Ваш код здесь
-# 1. Создайте копию и добавьте NaN значения
-# 2. Найдите пропущенные значения
-# 3. Заполните числовые пропуски средним
-# 4. Заполните булевы пропуски False
-# 5. Удалите строки с пропусками в именах
-```
-
-### Решение 1.6:
-```python
-# 1. Создаем копию и добавляем пропущенные значения
-df_with_missing = df_camp.copy()
-df_with_missing.loc[1, 'возраст'] = np.nan
-df_with_missing.loc[3, 'присядет_за_лагерь'] = np.nan
-df_with_missing.loc[5, 'заболеет'] = np.nan
-
-print("DataFrame с пропущенными значениями:")
-print(df_with_missing)
-
-# 2. Находим пропущенные значения
-print("\\nПропущенные значения по столбцам:")
-print(df_with_missing.isnull().sum())
-
-# 3. Заполняем числовые пропуски средним значением
-df_filled = df_with_missing.copy()
-numeric_columns = ['возраст', 'присядет_за_лагерь', 'опоздает_минут']
-for col in numeric_columns:
-    if df_filled[col].isnull().any():
-        mean_value = df_filled[col].mean()
-        df_filled[col].fillna(mean_value, inplace=True)
-        print(f"\\nЗаполнили пропуски в '{col}' средним значением: {mean_value:.1f}")
-
-# 4. Заполняем булевы пропуски значением False
-bool_columns = ['жалуется_на_душ', 'заболеет', 'поймают_с_запрещенкой']
-for col in bool_columns:
-    if df_filled[col].isnull().any():
-        df_filled[col].fillna(False, inplace=True)
-        print(f"Заполнили пропуски в '{col}' значением False")
-
-print("\\nDataFrame после заполнения пропусков:")
-print(df_filled)
-print("\\nПроверка пропущенных значений:")
-print(df_filled.isnull().sum())
-```
-
-### Задание 1.7: Добавление и удаление столбцов
-
-**Теория:**
-В pandas легко добавлять новые столбцы и удалять существующие. Новые столбцы можно создавать на основе вычислений с существующими данными.
-
-**Задание:**
-1. Добавьте столбец 'спортивность' (присядет_за_лагерь / 10)
-2. Добавьте столбец 'проблемный' (True если заболеет ИЛИ поймают с запрещенкой)
-3. Добавьте столбец 'категория_возраста' ('младший' для возраста 15-16, 'старший' для 17+)
-4. Удалите столбец 'опоздает_минут'
-5. Переименуйте столбец 'жалуется_на_душ' в 'недоволен_условиями'
-
-```python
-# Ваш код здесь
-# 1. Добавьте столбец спортивность
-# 2. Добавьте столбец проблемный
-# 3. Добавьте категорию возраста
-# 4. Удалите столбец опозданий
-# 5. Переименуйте столбец
-```
-
-### Решение 1.7:
-```python
-# Работаем с исходным DataFrame
-df_modified = df_camp.copy()
-
-# 1. Добавляем столбец спортивность
-df_modified['спортивность'] = df_modified['присядет_за_лагерь'] / 10
-print("Добавлен столбец 'спортивность'")
-
-# 2. Добавляем столбец проблемный
-df_modified['проблемный'] = (df_modified['заболеет']) | (df_modified['поймают_с_запрещенкой'])
-print("Добавлен столбец 'проблемный'")
-
-# 3. Добавляем категорию возраста
-df_modified['категория_возраста'] = df_modified['возраст'].apply(
-    lambda x: 'младший' if x <= 16 else 'старший'
-)
-print("Добавлен столбец 'категория_возраста'")
-
-# 4. Удаляем столбец опозданий
-df_modified = df_modified.drop('опоздает_минут', axis=1)
-print("Удален столбец 'опоздает_минут'")
-
-# 5. Переименовываем столбец
-df_modified = df_modified.rename(columns={'жалуется_на_душ': 'недоволен_условиями'})
-print("Переименован столбец 'жалуется_на_душ' -> 'недоволен_условиями'")
-
-print("\\nИтоговый DataFrame:")
-print(df_modified)
-print("\\nСтолбцы в итоговом DataFrame:")
-print(df_modified.columns.tolist())
-```
-
-### Задание 1.8: Изменение типов данных
-
-**Теория:**
-Правильные типы данных важны для эффективной работы и корректных вычислений. Pandas позволяет изменять типы данных с помощью `astype()` и других методов.
-
-**Задание:**
-1. Проверьте текущие типы данных в DataFrame
-2. Преобразуйте столбец 'возраст' в тип float
-3. Преобразуйте булевы столбцы в тип int (True=1, False=0)
-4. Создайте столбец 'имя_категория' как категориальный тип данных
-5. Проверьте изменения типов и сравните использование памяти
-
-```python
-# Ваш код здесь
-# 1. Проверьте типы данных
-# 2. Преобразуйте возраст в float
-# 3. Преобразуйте булевы в int
-# 4. Создайте категориальный столбец
-# 5. Сравните использование памяти
-```
-
-### Решение 1.8:
-```python
-# 1. Проверяем текущие типы данных
-print("Исходные типы данных:")
-print(df_camp.dtypes)
-print("\\nИспользование памяти:")
-print(df_camp.memory_usage(deep=True))
-
-# Создаем копию для преобразований
-df_types = df_camp.copy()
-
-# 2. Преобразуем возраст в float
-df_types['возраст'] = df_types['возраст'].astype(float)
-print("\\nВозраст преобразован в float")
-
-# 3. Преобразуем булевы столбцы в int
-bool_columns = ['жалуется_на_душ', 'заболеет', 'поймают_с_запрещенкой']
-for col in bool_columns:
-    df_types[col] = df_types[col].astype(int)
-print("Булевы столбцы преобразованы в int")
-
-# 4. Создаем категориальный столбец
-df_types['имя_категория'] = df_types['имя'].astype('category')
-print("Создан категориальный столбец")
-
-# 5. Проверяем изменения
-print("\\nТипы данных после преобразований:")
-print(df_types.dtypes)
-print("\\nИспользование памяти после преобразований:")
-print(df_types.memory_usage(deep=True))
-
-print("\\nКатегории в столбце 'имя_категория':")
-print(df_types['имя_категория'].cat.categories)
-print("\\nПример преобразованных данных:")
-print(df_types.head())
-```
-
----
-
-## Блок 2: Загрузка и исследование реальных данных (20 минут)
-
-### Задание 2.1: Загрузка и первичный анализ датасета зарплат
-
-**Теория:**
-Для загрузки CSV файлов используется `pd.read_csv()`. Для первичного анализа данных полезны методы: `head()`, `tail()`, `info()`, `describe()`, `shape`, `columns`.
-
-**Задание:**
-1. Загрузите датасет "Salary Data.csv" в переменную `df`
-2. Выведите размер датасета (количество строк и столбцов)
-3. Посмотрите на первые 5 строк
-4. Получите описательную статистику для числовых столбцов
-5. Проверьте наличие пропущенных значений
-
-```python
-# Ваш код здесь
-# 1. Загрузите CSV файл
-# 2. Выведите shape датасета
-# 3. Выведите первые 5 строк
-# 4. Получите описательную статистику
-# 5. Проверьте пропущенные значения с помощью isnull().sum()
-```
-
-### Решение 2.1:
-```python
-# 1. Загружаем датасет
-df = pd.read_csv('Salary Data.csv')
-
-# 2. Размер датасета
-print(f"Размер датасета: {df.shape[0]} строк, {df.shape[1]} столбцов")
-
-# 3. Первые 5 строк
-print("\\nПервые 5 строк:")
-print(df.head())
-
-# 4. Описательная статистика
-print("\\nОписательная статистика:")
-print(df.describe())
-
-# 5. Пропущенные значения
-print("\\nПропущенные значения:")
-print(df.isnull().sum())
-
-print("\\nНазвания столбцов:")
-print(df.columns.tolist())
-```
-
-### Задание 2.2: Исследование категориальных данных
-
-**Теория:**
-Для анализа категориальных данных используются: `value_counts()`, `unique()`, `nunique()`. Эти методы помогают понять распределение категорий.
-
-**Задание:**
-1. Посмотрите уникальные значения в столбце "Gender"
-2. Подсчитайте количество людей каждого пола
-3. Найдите все уникальные уровни образования
-4. Посмотрите топ-5 самых популярных должностей
-
-```python
-# Ваш код здесь
-# 1. Уникальные значения пола
-# 2. Подсчет по полу с помощью value_counts()
-# 3. Уникальные уровни образования
-# 4. Топ-5 должностей
-```
-
-### Решение 2.2:
-```python
-# 1. Уникальные значения пола
-print("Уникальные значения пола:")
-print(df['Gender'].unique())
-
-# 2. Распределение по полу
-print("\\nРаспределение по полу:")
-print(df['Gender'].value_counts())
-
-# 3. Уровни образования
-print("\\nУровни образования:")
-print(df['Education Level'].unique())
-print("\\nРаспределение по образованию:")
-print(df['Education Level'].value_counts())
-
-# 4. Топ-5 должностей
-print("\\nТоп-5 самых популярных должностей:")
-print(df['Job Title'].value_counts().head())
-```
-
----
-
-## Блок 3: Группировка и агрегация данных (25 минут)
-
-### Задание 3.1: Анализ зарплат по группам
-
-**Теория:**
-Группировка данных выполняется с помощью `groupby()`. После группировки можно применять агрегирующие функции: `mean()`, `sum()`, `count()`, `min()`, `max()`.
-
-**Задание:**
-1. Найдите среднюю зарплату по полу
-2. Найдите среднюю зарплату по уровню образования
-3. Создайте сводную таблицу средних зарплат по полу и образованию
-4. Найдите максимальную и минимальную зарплату для каждого уровня образования
-
-```python
-# Ваш код здесь
-# 1. Средняя зарплата по полу
-# 2. Средняя зарплата по образованию
-# 3. Сводная таблица с помощью pivot_table()
-# 4. Максимальная и минимальная зарплата по образованию
-```
-
-### Решение 3.1:
-```python
-# 1. Средняя зарплата по полу
-salary_by_gender = df.groupby('Gender')['Salary'].mean()
-print("Средняя зарплата по полу:")
-print(salary_by_gender.round(2))
-
-# 2. Средняя зарплата по образованию
-salary_by_education = df.groupby('Education Level')['Salary'].mean().sort_values(ascending=False)
-print("\\nСредняя зарплата по уровню образования:")
-print(salary_by_education.round(2))
-
-# 3. Сводная таблица
-pivot_table = df.pivot_table(values='Salary', 
-                            index='Education Level', 
-                            columns='Gender', 
-                            aggfunc='mean')
-print("\\nСводная таблица зарплат (образование × пол):")
-print(pivot_table.round(2))
-
-# 4. Мин и макс зарплата по образованию
-salary_stats = df.groupby('Education Level')['Salary'].agg(['min', 'max', 'mean'])
-print("\\nСтатистика зарплат по образованию:")
-print(salary_stats.round(2))
-```
-
-### Задание 3.2: Анализ опыта работы и возраста
-
-**Теория:**
-Можно группировать данные по нескольким столбцам одновременно и применять различные функции агрегации.
-
-**Задание:**
-1. Найдите корреляцию между возрастом и зарплатой
-2. Создайте группы по опыту работы (0-5, 6-10, 11-15, 16+ лет)
-3. Для каждой группы опыта найдите среднюю зарплату и средний возраст
-4. Найдите топ-3 должности с самой высокой средней зарплатой
-
-```python
-# Ваш код здесь
-# 1. Корреляция возраста и зарплаты
-# 2. Создайте столбец с группами опыта с помощью pd.cut()
-# 3. Группировка по опыту
-# 4. Топ-3 должности по зарплате
-```
-
-### Решение 3.2:
-```python
-# 1. Корреляция возраста и зарплаты
-correlation = df['Age'].corr(df['Salary'])
-print(f"Корреляция между возрастом и зарплатой: {correlation:.3f}")
-
-# 2. Создаем группы опыта
-df['Experience_Group'] = pd.cut(df['Years of Experience'], 
-                               bins=[0, 5, 10, 15, float('inf')], 
-                               labels=['0-5 лет', '6-10 лет', '11-15 лет', '16+ лет'],
-                               include_lowest=True)
-
-# 3. Анализ по группам опыта
-exp_analysis = df.groupby('Experience_Group')[['Salary', 'Age']].mean()
-print("\\nАнализ по группам опыта:")
-print(exp_analysis.round(2))
-
-# 4. Топ-3 должности по зарплате
-top_jobs = df.groupby('Job Title')['Salary'].mean().sort_values(ascending=False).head(3)
-print("\\nТоп-3 должности по средней зарплате:")
-for job, salary in top_jobs.items():
-    print(f"{job}: ${salary:,.2f}")
-```
-
----
-
-## Блок 4: Визуализация данных (25 минут)
-
-### Задание 4.1: Базовые графики
-
-**Теория:**
-Pandas интегрирован с matplotlib, что позволяет строить графики прямо из DataFrame с помощью метода `.plot()`.
-
-**Задание:**
-1. Постройте гистограмму распределения зарплат
-2. Создайте box plot зарплат по полу
-3. Постройте scatter plot возраста и зарплаты
-4. Создайте bar chart средних зарплат по образованию
-
-```python
-# Ваш код здесь
-# 1. Гистограмма зарплат
-# 2. Box plot по полу
-# 3. Scatter plot возраст-зарплата
-# 4. Bar chart по образованию
-```
-
-### Решение 4.1:
-```python
-# Создаем subplots для размещения графиков
-fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-
-# 1. Гистограмма зарплат
-df['Salary'].hist(bins=30, ax=axes[0,0])
-axes[0,0].set_title('Распределение зарплат')
-axes[0,0].set_xlabel('Зарплата ($)')
-axes[0,0].set_ylabel('Частота')
-
-# 2. Box plot по полу
-df.boxplot(column='Salary', by='Gender', ax=axes[0,1])
-axes[0,1].set_title('Распределение зарплат по полу')
-axes[0,1].set_xlabel('Пол')
-axes[0,1].set_ylabel('Зарплата ($)')
-
-# 3. Scatter plot возраст-зарплата
-df.plot.scatter(x='Age', y='Salary', ax=axes[1,0], alpha=0.6)
-axes[1,0].set_title('Зависимость зарплаты от возраста')
-
-# 4. Bar chart по образованию
-salary_by_education.plot.bar(ax=axes[1,1])
-axes[1,1].set_title('Средняя зарплата по образованию')
-axes[1,1].set_xlabel('Уровень образования')
-axes[1,1].set_ylabel('Средняя зарплата ($)')
-axes[1,1].tick_params(axis='x', rotation=45)
+# Решение задания 3.3
+# 1. Создаём DataFrame с разными типами данных
+data = pd.DataFrame({
+    'возраст': возраст,
+    'опыт': опыт,
+    'пол': пол,
+    'образование': образование,
+    'зарплата': зарплата
+})
+
+print("Структура данных:")
+print(data.info())
+print("\nПервые 5 строк:")
+print(data.head())
+
+# 2. Разделяем на признаки и целевую переменную
+X = data.drop('зарплата', axis=1)
+y = data['зарплата']
+
+# 3. Определяем типы признаков
+numeric_features = ['возраст', 'опыт']
+categorical_features = ['пол', 'образование']
+
+print(f"\nЧисловые признаки: {numeric_features}")
+print(f"Категориальные признаки: {categorical_features}")
+
+# 4. Создаём ColumnTransformer
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), numeric_features),
+        ('cat', OneHotEncoder(drop='first'), categorical_features)
+    ])
+
+# 5. Создаём Pipeline
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('regressor', LinearRegression())
+])
+
+# 6. Разделяем данные на train/test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print(f"\nРазмеры наборов данных:")
+print(f"Train: {X_train.shape}, Test: {X_test.shape}")
+
+# 7. Обучаем и оцениваем модель
+pipeline.fit(X_train, y_train)
+
+y_train_pred = pipeline.predict(X_train)
+y_test_pred = pipeline.predict(X_test)
+
+train_mse = mean_squared_error(y_train, y_train_pred)
+test_mse = mean_squared_error(y_test, y_test_pred)
+train_mae = mean_absolute_error(y_train, y_train_pred)
+test_mae = mean_absolute_error(y_test, y_test_pred)
+
+print(f"\nРЕЗУЛЬТАТЫ PIPELINE:")
+print("=" * 25)
+print(f"Train MSE: {train_mse:.2f}")
+print(f"Test MSE:  {test_mse:.2f}")
+print(f"Train MAE: {train_mae:.2f}")
+print(f"Test MAE:  {test_mae:.2f}")
+
+# Извлекаем веса из pipeline
+model = pipeline.named_steps['regressor']
+weights = model.coef_
+bias = model.intercept_
+
+# Получаем названия признаков после предобработки
+ohe = pipeline.named_steps['preprocessor'].named_transformers_['cat']
+feature_names_final = (numeric_features + 
+                      list(ohe.get_feature_names_out(categorical_features)))
+
+print(f"\nПризнаки после предобработки:")
+for i, name in enumerate(feature_names_final):
+    print(f"{i+1}. {name}: {weights[i]:.2f}")
+
+# Визуализация результатов
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.scatter(y_test, y_test_pred, alpha=0.6)
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+plt.xlabel('Истинная зарплата')
+plt.ylabel('Предсказанная зарплата')
+plt.title('Предсказания vs Истинные значения')
+plt.grid(True, alpha=0.3)
+
+plt.subplot(1, 2, 2)
+plt.bar(range(len(weights)), weights)
+plt.xticks(range(len(feature_names_final)), feature_names_final, rotation=45)
+plt.ylabel('Вес (после стандартизации)')
+plt.title('Веса признаков в Pipeline')
+plt.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.show()
+
+print(f"\nПреимущества Pipeline:")
+print("1. Автоматическая предобработка разных типов признаков")
+print("2. Избежание data leakage (StandardScaler fit только на train)")
+print("3. Удобство использования для новых данных")
+print("4. Единый интерфейс для всего процесса обучения")
 ```
 
-### Задание 4.2: Продвинутая визуализация с matplotlib
+### Задание 3.4: Интерпретация результатов с категориальными признаками
 
 **Теория:**
-Matplotlib предоставляет широкие возможности для создания информативных графиков. Можно создавать тепловые карты, violin plot-подобные графики и другие визуализации.
+После One-Hot Encoding интерпретация весов немного меняется. Веса показывают разность с базовой категорией (которую мы drop'нули).
 
 **Задание:**
-1. Создайте тепловую карту корреляций числовых переменных
-2. Постройте распределение зарплат по образованию (гистограммы)
-3. Создайте многомерный scatter plot с раскраской по полу
-4. Постройте горизонтальную диаграмму для анализа распределения должностей (топ-10)
+1. Извлеките и проинтерпретируйте веса из pipeline
+2. Создайте функцию предсказания для новых данных
+3. Протестируйте на примерах
 
 ```python
 # Ваш код здесь
-# 1. Тепловая карта корреляций с помощью imshow
-# 2. Гистограммы зарплат по образованию
-# 3. Scatter plot с раскраской по полу
-# 4. Горизонтальная диаграмма топ-10 должностей
-```
+# 1. Извлеките модель из pipeline
+trained_model = pipeline.named_steps['regressor']
+weights = trained_model.coef_
+intercept = trained_model.intercept_
 
-### Решение 4.2:
-```python
-# Подготавливаем данные для визуализации
-fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+# 2. Получите названия признаков после предобработки
+feature_names = (numeric_features + 
+                list(pipeline.named_steps['preprocessor']
+                    .named_transformers_['cat']
+                    .get_feature_names_out(# Ваш код здесь
+# 1. Извлеките модель из pipeline
+trained_model = pipeline.named_steps['regressor']
+weights = trained_model.coef_
+intercept = trained_model.intercept_
 
-# 1. Тепловая карта корреляций
-numeric_cols = ['Age', 'Years of Experience', 'Salary']
-correlation_matrix = df[numeric_cols].corr()
-
-im = axes[0,0].imshow(correlation_matrix, cmap='coolwarm', vmin=-1, vmax=1)
-axes[0,0].set_xticks(range(len(numeric_cols)))
-axes[0,0].set_yticks(range(len(numeric_cols)))
-axes[0,0].set_xticklabels(numeric_cols, rotation=45)
-axes[0,0].set_yticklabels(numeric_cols)
-
-# Добавляем значения корреляций на карту
-for i in range(len(numeric_cols)):
-    for j in range(len(numeric_cols)):
-        text = axes[0,0].text(j, i, f'{correlation_matrix.iloc[i, j]:.2f}',
-                             ha="center", va="center", color="black", fontweight='bold')
-
-axes[0,0].set_title('Корреляции числовых переменных')
-plt.colorbar(im, ax=axes[0,0])
-
-# 2. Гистограммы зарплат по образованию
-education_levels = df['Education Level'].unique()
-colors = plt.cm.Set1(np.linspace(0, 1, len(education_levels)))
-
-for i, edu_level in enumerate(education_levels):
-    edu_data = df[df['Education Level'] == edu_level]['Salary']
-    axes[0,1].hist(edu_data, alpha=0.7, label=edu_level, color=colors[i], bins=20)
-
-axes[0,1].set_xlabel('Зарплата ($)')
-axes[0,1].set_ylabel('Частота')
-axes[0,1].set_title('Распределение зарплат по образованию')
-axes[0,1].legend()
-
-# 3. Scatter plot с раскраской по полу
-colors_gender = {'Male': 'blue', 'Female': 'red'}
-for gender in df['Gender'].unique():
-    gender_data = df[df['Gender'] == gender]
-    axes[1,0].scatter(gender_data['Years of Experience'], gender_data['Salary'], 
-                     label=gender, alpha=0.6, color=colors_gender.get(gender, 'gray'))
-axes[1,0].set_xlabel('Опыт работы (лет)')
-axes[1,0].set_ylabel('Зарплата ($)')
-axes[1,0].set_title('Зарплата vs Опыт (по полу)')
-axes[1,0].legend()
-
-# 4. Горизонтальная диаграмма топ-10 должностей
-top_jobs_counts = df['Job Title'].value_counts().head(10)
-y_pos = range(len(top_jobs_counts))
-
-axes[1,1].barh(y_pos, top_jobs_counts.values)
-axes[1,1].set_yticks(y_pos)
-axes[1,1].set_yticklabels(top_jobs_counts.index)
-axes[1,1].set_xlabel('Количество сотрудников')
-axes[1,1].set_title('Топ-10 должностей по количеству')
-
-plt.tight_layout()
-plt.show()
-```
-
----
-
-## Блок 5: Продвинутый анализ данных (20 минут)
-
-### Задание 5.1: Создание новых признаков и анализ
-
-**Теория:**
-Часто нужно создавать новые столбцы на основе существующих данных для более глубокого анализа.
-
-**Задание:**
-1. Создайте столбец "Salary_per_Experience" (зарплата на год опыта)
-2. Создайте категории зарплат: "Low" (<75k), "Medium" (75k-125k), "High" (>125k)
-3. Найдите средний возраст для каждой категории зарплат
-4. Определите, какой процент людей с PhD получает зарплату в категории "High"
-
-```python
-# Ваш код здесь
-# 1. Создайте Salary_per_Experience
-# 2. Создайте категории зарплат с помощью pd.cut()
-# 3. Средний возраст по категориям зарплат
-# 4. Процент PhD в категории High
-```
-
-### Решение 5.1:
-```python
-# 1. Зарплата на год опыта (избегаем деления на 0)
-df['Salary_per_Experience'] = df['Salary'] / (df['Years of Experience'] + 1)
-
-# 2. Категории зарплат
-df['Salary_Category'] = pd.cut(df['Salary'], 
-                              bins=[0, 75000, 125000, float('inf')], 
-                              labels=['Low', 'Medium', 'High'])
-
-print("Распределение по категориям зарплат:")
-print(df['Salary_Category'].value_counts())
-
-# 3. Средний возраст по категориям зарплат
-age_by_salary_cat = df.groupby('Salary_Category')['Age'].mean()
-print("\\nСредний возраст по категориям зарплат:")
-print(age_by_salary_cat.round(1))
-
-# 4. Процент PhD в категории High
-phd_high_salary = df[(df['Education Level'] == 'PhD') & (df['Salary_Category'] == 'High')]
-total_phd = df[df['Education Level'] == 'PhD']
-percentage = len(phd_high_salary) / len(total_phd) * 100
-
-print(f"\\nПроцент людей с PhD в категории High: {percentage:.1f}%")
-
-# Дополнительная статистика
-print("\\nТоп-5 по зарплате на год опыта:")
-print(df.nlargest(5, 'Salary_per_Experience')[['Job Title', 'Salary', 'Years of Experience', 'Salary_per_Experience']])
-```
-
-### Задание 5.2: Итоговый анализ и выводы
-
-**Теория:**
-Финальный анализ должен объединить все полученные знания и дать практические выводы.
-
-**Задание:**
-1. Найдите самую высокооплачиваемую должность в среднем
-2. Определите оптимальный уровень образования с точки зрения ROI (зарплата/годы обучения)
-3. Создайте профиль "идеального" кандидата для высокой зарплаты
-4. Сделайте 3 практических вывода из анализа данных
-
-```python
-# Ваш код здесь
-# 1. Самая высокооплачиваемая должность
-# 2. ROI по образованию (предположим: Bachelor's=4 года, Master's=6, PhD=8)
-# 3. Анализ характеристик людей с зарплатой >150k
-# 4. Выводы
-```
-
-### Решение 5.2:
-```python
-# 1. Самая высокооплачиваемая должность
-highest_paid_job = df.groupby('Job Title')['Salary'].mean().sort_values(ascending=False)
-print("Топ-5 самых высокооплачиваемых должностей:")
-print(highest_paid_job.head().round(2))
-
-# 2. ROI по образованию
-education_years = {'High School': 0, "Bachelor's": 4, "Master's": 6, 'PhD': 8}
-df['Education_Years'] = df['Education Level'].map(education_years)
-df['Education_ROI'] = df['Salary'] / (df['Education_Years'] + 1)  # +1 чтобы избежать деления на 0
-
-roi_by_education = df.groupby('Education Level')['Education_ROI'].mean().sort_values(ascending=False)
-print("ROI по уровню образования (зарплата/годы обучения):")
-print(roi_by_education.round(2))
-
-# 3. Профиль для высокой зарплаты (>150k)
-high_earners = df[df['Salary'] > 150000]
-print(f"\\nАнализ высокооплачиваемых сотрудников ({len(high_earners)} человек):")
-print(f"Средний возраст: {high_earners['Age'].mean():.1f} лет")
-print(f"Средний опыт: {high_earners['Years of Experience'].mean():.1f} лет")
-print("Распределение по образованию:")
-print(high_earners['Education Level'].value_counts(normalize=True).round(3) * 100)
-print("Распределение по полу:")
-print(high_earners['Gender'].value_counts(normalize=True).round(3) * 100)
-
-# 4. Практические выводы
-print("\\n" + "="*50)
-print("ПРАКТИЧЕСКИЕ ВЫВОДЫ:")
-print("="*50)
-print("1. ОБРАЗОВАНИЕ: Магистерская степень дает лучший баланс зарплаты и времени обучения")
-print(f"2. ОПЫТ: Сотрудники с зарплатой >150k имеют в среднем {high_earners['Years of Experience'].mean():.1f} лет опыта")
-print("3. ДОЛЖНОСТИ: Управленческие позиции (Director, Senior Manager) показывают наивысшие зарплаты")
-```
-
----
-
-## Заключение
-
-**Поздравляем! Вы успешно освоили основы работы с pandas:**
-
-✅ Создание и манипулирование DataFrame  
-✅ Загрузка и исследование реальных данных  
-✅ Группировка и агрегация данных  
-✅ Визуализация результатов  
-✅ Создание новых признаков и анализ  
-
-**Дополнительные задачи для самостоятельной работы:**
-1. Исследуйте зависимость зарплаты от комбинации возраста и опыта
-2. Найдите аномалии в данных (необычно высокие/низкие зарплаты)
-3. Создайте модель для предсказания категории зарплаты
-4. Проведите анализ по географическим регионам (если добавить столбец с городами)
-
-```python
-print("Спасибо за участие в практикуме по pandas!")
-print("Теперь вы готовы к более сложным задачам анализа данных!")
-```
+# 2. Получите названия признаков после предобработки
+feature_names = (numeric_features + 
+                list(pipeline.named_steps['preprocessor']
+                    .named_transformers_['cat']
+                    .get_feature_names_out(
 """
 
 text_content = fix_fstring_issues(text_content)
@@ -949,7 +1285,7 @@ for part_type, content in parts:
 nb['cells'] = cells
 
 # Сохраняем ноутбук
-output_path = Path("pandas.ipynb")
+output_path = Path("linear.ipynb")
 with open(output_path, "w", encoding="utf-8") as f:
     nbf.write(nb, f)
 

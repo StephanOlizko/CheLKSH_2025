@@ -1,13 +1,13 @@
 #!/bin/bash
 # quest_setup.sh - подготовка квеста
 
-# Создаем основные директории для квеста
-mkdir -p /tmp/tech_records
-mkdir -p /secret/archives
-mkdir -p /var/tmp/gaming_data
+# Создаем основные директории для квеста в домашней папке
+mkdir -p ~/temp/tech_records
+mkdir -p ~/secret/archives
+mkdir -p ~/var_temp/gaming_data
 
 # Рекорд 1: Программирование
-cat > /tmp/tech_records/coding_record.data << 'EOF'
+cat > ~/temp/tech_records/coding_record.data << 'EOF'
 ТЕХНОЛОГИЧЕСКИЙ РЕКОРД: Самый длинный марафон программирования
 
 Рекордсмен: Алвин Ашкрафт (США)
@@ -22,7 +22,7 @@ cat > /tmp/tech_records/coding_record.data << 'EOF'
 EOF
 
 # Рекорд 2: Видеоигры
-cat > /var/tmp/gaming_data/gaming_record.data << 'EOF'
+cat > ~/var_temp/gaming_data/gaming_record.data << 'EOF'
 ИГРОВОЙ РЕКОРД: Самая дорогостоящая видеоигра в разработке
 
 Проект: Grand Theft Auto V
@@ -37,7 +37,7 @@ cat > /var/tmp/gaming_data/gaming_record.data << 'EOF'
 EOF
 
 # Рекорд 3: Интернет технологии
-cat > /secret/archives/internet_record.data << 'EOF'
+cat > ~/secret/archives/internet_record.data << 'EOF'
 СЕТЕВОЙ РЕКОРД: Максимальная скорость передачи данных
 
 Достижение: 178 терабит в секунду
@@ -52,7 +52,7 @@ cat > /secret/archives/internet_record.data << 'EOF'
 EOF
 
 # Финальный рекорд
-cat > /secret/archives/final_record.txt << 'EOF'
+cat > ~/secret/archives/final_record.txt << 'EOF'
 СЕКРЕТНЫЙ РЕКОРД: Самая молодая команда разработчиков приложения
 
 Проект: мобильная игра "Pocket Pixels" для iOS
@@ -85,9 +85,9 @@ check_research_base() {
         echo ""
         echo "ПЕРВАЯ ПОДСКАЗКА:"
         echo "Данные о рекордах находятся в трех локациях:"
-        echo "• /tmp/tech_records/ - технические достижения"
-        echo "• /var/tmp/gaming_data/ - игровые рекорды"  
-        echo "• /secret/archives/ - засекреченная информация"
+        echo "• ~/temp/tech_records/ - технические достижения"
+        echo "• ~/var_temp/gaming_data/ - игровые рекорды"  
+        echo "• ~/secret/archives/ - засекреченная информация"
         echo ""
         echo "ЗАДАНИЕ: Найдите все файлы с расширением .data и скопируйте их в папку records"
         return 0
@@ -150,7 +150,7 @@ check_analysis_complete() {
             echo "Аналитический отчет составлен на профессиональном уровне."
             echo ""
             echo "ФИНАЛЬНАЯ ПОДСКАЗКА:"
-            echo "В секретных архивах /secret/archives/ хранится особая запись."
+            echo "В секретных архивах ~/secret/archives/ хранится особая запись."
             echo "Найдите файл с самым вдохновляющим технологическим достижением."
             echo ""
             echo "ФИНАЛЬНОЕ ЗАДАНИЕ: Получите доступ к секретному архиву"
@@ -204,9 +204,9 @@ esac
 EOF
 
 chmod +x quest_checker.sh
-chmod +r /tmp/tech_records/*
-chmod +r /var/tmp/gaming_data/*
-chmod +r /secret/archives/*
+chmod +r ~/temp/tech_records/*
+chmod +r ~/var_temp/gaming_data/*
+chmod +r ~/secret/archives/*
 
 # Генерируем скрипт для очистки всех файлов квеста
 cat > quest_cleanup.sh << 'EOF'
@@ -215,10 +215,10 @@ cat > quest_cleanup.sh << 'EOF'
 
 echo "Удаление файлов квеста..."
 
-# Удаляем артефакты из системных директорий
-rm -rf /tmp/tech_records
-rm -rf /var/tmp/gaming_data
-rm -rf /secret/archives
+# Удаляем артефакты из домашней директории
+rm -rf ~/temp/tech_records
+rm -rf ~/var_temp/gaming_data
+rm -rf ~/secret/archives
 
 # Удаляем рабочую папку участника (если запускать из папки квеста)
 rm -rf ./record_hunt
@@ -283,9 +283,9 @@ cat > quest_tasks.txt << 'EOF'
 Что нужно сделать:
 1. Создайте файл record_analysis.txt в папке reports.
 2. Напишите в него анализ каждого найденного рекорда:
-   - Опишите рекорд марафона программирования (135 часов).
-   - Проанализируйте бюджет разработки GTA V ($265 млн).
-   - Объясните значение рекорда скорости интернета (178 терабит/с).
+   - Опишите рекорд марафона программирования.
+   - Проанализируйте бюджет разработки GTA V.
+   - Объясните значение рекорда скорости интернета.
 3. Каждое описание должно содержать минимум одну строку.
 4. Проверьте количество строк в файле.
 5. Запустите проверку: ./quest_checker.sh 4
